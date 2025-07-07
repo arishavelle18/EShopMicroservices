@@ -3,7 +3,7 @@
 namespace Catalog.API.Products.CreateProduct;
 
 public record CreateProductCommand(string Name,
-    List<string> Catergory, string Description, string ImageFile, decimal Price) : ICommand<CreateProductResult>;
+    List<string> Category, string Description, string ImageFile, decimal Price) : ICommand<CreateProductResult>;
 
 public record CreateProductResult(Guid Guid);
 
@@ -17,7 +17,7 @@ internal class CreateProductHandler(IDocumentSession session) : ICommandHandler<
         {
             Id = Guid.CreateVersion7(),
             Name = request.Name,
-            Catergory = request.Catergory,
+            Category = request.Category,
             Description = request.Description,
             ImageFile = request.ImageFile,
             Price = request.Price

@@ -1,4 +1,5 @@
 using BuildingBlocks.GenericAssembly;
+using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 // register services
@@ -13,6 +14,10 @@ builder.Services.AddMarten(opts =>
 {
     opts.Connection(builder.Configuration.GetConnectionString("CatalogDb")!);
 }).UseLightweightSessions();
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+});
 
 var app = builder.Build();
 

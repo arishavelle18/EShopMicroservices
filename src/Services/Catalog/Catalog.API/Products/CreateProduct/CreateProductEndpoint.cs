@@ -1,11 +1,13 @@
-﻿namespace Catalog.API.Products.CreateProduct;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Catalog.API.Products.CreateProduct;
 public class CreateProductEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/products", async (CreateProductCommand command, ISender sender) =>
+        app.MapPost("/products", async (CreateProductCommand request, ISender sender) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(request);
             return Results.Ok(result);
         })
         .WithName("CreateProduct")
