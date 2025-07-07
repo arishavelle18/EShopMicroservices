@@ -7,16 +7,4 @@ public class Product
     public string Description { get; set; } = default!;
     public string ImageFile { get; set; } = default!;
     public decimal Price { get; set; }
-    protected Product()
-    {
-    }
-    public Product(Guid id, string name, List<string> catergory, string description, string imageFile, decimal price)
-    {
-        Id = id;
-        Name = name;
-        Catergory = catergory;
-        Description = description;
-        ImageFile = imageFile;
-        Price = price;
-    }
 }

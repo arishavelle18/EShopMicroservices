@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.API.Models;
+﻿using System.Xml.Linq;
 
 namespace Catalog.API.Products.CreateProduct;
 
@@ -8,17 +7,24 @@ public record CreateProductCommand(string Name,
 
 public record CreateProductResult(Guid Guid);
 
-internal class CreateProductHandler : ICommandHandler<CreateProductCommand, CreateProductResult>
+internal class CreateProductHandler(IDocumentSession session) : ICommandHandler<CreateProductCommand, CreateProductResult>
 {
     public async Task<CreateProductResult> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
         //business logic for creating product
         //create product entity from command object
-        var newProduct = new Product(Guid.CreateVersion7(), request.Name, request.Catergory, request.Description, request.ImageFile, request.Price);
+        var newProduct = new Product 
+        {
+            Id = Guid.CreateVersion7(),
+            Name = request.Name,
+            Catergory = request.Catergory,
+            Description = request.Description,
+            ImageFile = request.ImageFile,
+            Price = request.Price
+        };
 
-        // TODO
-        //save product to database
-
+        session.Store(newProduct);
+        await session.SaveChangesAsync(cancellationToken);
         //return result
         return new CreateProductResult(newProduct.Id);
     }
