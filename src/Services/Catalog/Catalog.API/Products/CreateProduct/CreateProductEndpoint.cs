@@ -1,17 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿namespace Catalog.API.Products.CreateProduct;
 
-namespace Catalog.API.Products.CreateProduct;
+public record CreateProductRequest(string Name, List<string> Category, string Description, string ImageFile, decimal Price);
+public record CreateProductResponse(Guid Id);
+
 public class CreateProductEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/products", async (CreateProductCommand request, ISender sender) =>
+        app.MapPost("/products", async (CreateProductRequest request, ISender sender) =>
         {
-            var result = await sender.Send(request);
-            return Results.Ok(result);
+            var convertToCreateProductCommand = request.Adapt<CreateProductCommand>();
+            var result = await sender.Send(convertToCreateProductCommand);
+            var convertToCreateProductResponse = result.Adapt<CreateProductResponse>();
+            return Results.Ok(convertToCreateProductResponse);
         })
         .WithName("CreateProduct")
-        .Produces<CreateProductResult>(StatusCodes.Status201Created)
+        .Produces<CreateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Create Product")
         .WithDescription("Create Product"); ;

@@ -2,22 +2,23 @@
 
 public record DeleteProductCommand(Guid Id) : ICommand<DeleteProductResult>;
 
-public record DeleteProductResult(Guid Id);
+public record DeleteProductResult(bool IsSuccess);
 
-public class DeleteProductHandler(IDocumentSession session) : ICommandHandler<DeleteProductCommand, DeleteProductResult>
+internal class DeleteProductHandler(IDocumentSession session, ILogger<DeleteProductHandler> logger) : ICommandHandler<DeleteProductCommand, DeleteProductResult>
 {
     public async Task<DeleteProductResult> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
         //check the product if existing 
-        var checkProductIsExisting = await session.Query<Product>()
-            .FirstOrDefaultAsync(item => item.Id == request.Id, cancellationToken);
-        if (checkProductIsExisting == null)
+        var checkProductIsExisting = await session.LoadAsync<Product>(request.Id, cancellationToken);
+        if (checkProductIsExisting is null)
         {
-            throw new Exception("Product not found");
+            logger.LogError("Product not Found!");
+            throw new ProductNotFoundException();
         }
         session.Delete(checkProductIsExisting);
         await session.SaveChangesAsync(cancellationToken);
-        return new DeleteProductResult(checkProductIsExisting.Id);
+        logger.LogInformation("Product deleted succefully!");
+        return new DeleteProductResult(true);
     }
 }
 

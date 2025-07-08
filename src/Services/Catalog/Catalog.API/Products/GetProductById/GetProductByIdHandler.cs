@@ -4,15 +4,17 @@ public record GetProductByIdQuery(Guid Id) : IQuery<GetProductByIdResult>;
 
 public record GetProductByIdResult(Product Product);
 
-internal class GetProductByIdHandler(IDocumentSession session) : IQueryHandler<GetProductByIdQuery, GetProductByIdResult>
+internal class GetProductByIdHandler(IDocumentSession session, ILogger<GetProductByIdHandler> logger) : IQueryHandler<GetProductByIdQuery, GetProductByIdResult>
 {
     public async Task<GetProductByIdResult> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var getProduct = await session.Query<Product>().FirstOrDefaultAsync(item => item.Id == request.Id, cancellationToken);
-        if (getProduct == null)
+        var getProduct = await session.LoadAsync<Product>(request.Id,cancellationToken);
+        if (getProduct is null)
         {
-            throw new Exception("Product not found");
+            logger.LogError("Product is not found");
+            throw new ProductNotFoundException();
         }
+        logger.LogInformation($"{request.Id} is succeefully retrieved");
         return new GetProductByIdResult(getProduct);
     }
 }
