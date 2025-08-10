@@ -12,7 +12,7 @@ internal class GetProductByIdHandler(IDocumentSession session, ILogger<GetProduc
         if (getProduct is null)
         {
             logger.LogError("Product is not found");
-            throw new ProductNotFoundException();
+            throw new ProductNotFoundException(nameof(Product),request.Id);
         }
         logger.LogInformation($"{request.Id} is succeefully retrieved");
         return new GetProductByIdResult(getProduct);

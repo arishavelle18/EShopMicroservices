@@ -18,6 +18,7 @@ public class DeleteProductEndpoint : ICarterModule
         .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Delete Product By Id")
-        .WithDescription("Delete Product By Id");
+        .WithDescription("Delete Product By Id")
+        .AddFluentValidationAutoValidation();
     }
 }

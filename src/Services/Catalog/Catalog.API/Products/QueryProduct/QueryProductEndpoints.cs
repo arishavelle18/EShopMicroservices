@@ -1,14 +1,16 @@
 ﻿namespace Catalog.API.Products.QueryProduct;
 
+public record QueryProductRequest(int? PageNumber = 1, int? PageSize = 10);
 public record QueryProductResponse(IEnumerable<Product> Products);
 
 public class QueryProductEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/products", async (ISender sender) =>
+        app.MapGet("/products", async (ISender sender, [AsParameters] QueryProductRequest queryProductRequest) =>
         {
-            var result = await sender.Send(new QueryProductQuery());
+            var req = queryProductRequest.Adapt<QueryProductQuery>();
+            var result = await sender.Send(req);
             var convertToQueryProductResponse = result.Adapt<QueryProductResponse>();
             return Results.Ok(convertToQueryProductResponse);
         })

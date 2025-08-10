@@ -14,7 +14,7 @@ public class GetProductsByCategoryHandler(IDocumentSession session) : IQueryHand
 
         if (getProductsByCategory == null || !getProductsByCategory.Any())
         {
-            throw new Exception("No products found for the specified category");
+            throw new ProductNotFoundException("Products are not found!");
         }
 
         return new GetProductsByCategoryResult(getProductsByCategory);

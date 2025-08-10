@@ -5,3 +5,7 @@ global using BuildingBlocks.CQRS;
 global using Catalog.API.Models;
 global using Marten;
 global using Catalog.API.Exceptions;
+global using BuildingBlocks.GenericAssembly;
+global using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
+global using FluentValidation;
+global using BuildingBlocks.Behaviors;
