@@ -1,8 +1,3 @@
-using BuildingBlocks.Exceptions.Handler;
-using Catalog.API.Data;
-using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-
 var builder = WebApplication.CreateBuilder(args);
 // register services
 // add services to the container
@@ -41,6 +36,6 @@ var app = builder.Build();
 
 app.MapCarter(); // Carter is a library for building HTTP APIs in .NET using a modular approach
 app.UseExceptionHandler();
-app.MapHealthChecks("/health",new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse});
+app.MapHealthChecks("/health", new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
 
 app.Run();
