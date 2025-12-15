@@ -15,7 +15,7 @@ public class DiscountService(DiscountContext discountContext, ILogger<DiscountSe
 
         if(getDiscountByProductName is null)
         {
-            return new CouponModel { Id = "N/A", ProductName = "No Discount", Description = "No Discount Description", Amount = 0 };
+            throw new RpcException(new Status(StatusCode.NotFound, $"Discount with ProductName={request.ProductName} not found."));
         }
         logger.LogInformation("Discount is retrieved for ProductName : {ProductName}, Amount : {Amount}", getDiscountByProductName.ProductName, getDiscountByProductName.Amount);
         return new CouponModel { Id = getDiscountByProductName!.Id.ToString(),ProductName = getDiscountByProductName.ProductName,Description = getDiscountByProductName.Description, Amount = getDiscountByProductName.Amount };
@@ -33,7 +33,7 @@ public class DiscountService(DiscountContext discountContext, ILogger<DiscountSe
         var convertToDto = Coupon.Create(request.ProductName, request.Description, request.Amount);
         await discountContext.AddAsync(convertToDto, cancellationToken: cancellationToken);
         await discountContext.SaveChangesAsync(cancellationToken: cancellationToken);
-
+        logger.LogInformation("Discount is successfully created. Product Name: {ProductName}", request.ProductName);
         return new CouponModel { Id = convertToDto!.Id.ToString(), ProductName = convertToDto.ProductName, Description = convertToDto.Description, Amount = convertToDto.Amount };
     }
 
@@ -45,7 +45,7 @@ public class DiscountService(DiscountContext discountContext, ILogger<DiscountSe
 
         if (getDiscountById is null)
         {
-            return new CouponModel { Id = "N/A", ProductName = "No Discount", Description = "No Discount Description", Amount = 0 };
+            throw new RpcException(new Status(StatusCode.NotFound, $"Discount with ProductName={request.ProductName} not found."));
         }
 
         //update
@@ -53,12 +53,12 @@ public class DiscountService(DiscountContext discountContext, ILogger<DiscountSe
 
         discountContext.Update(getDiscountById);
         await discountContext.SaveChangesAsync(cancellationToken: cancellationToken);
-
+        logger.LogInformation("Discount is successfully updated. Product Name: {ProductName}", request.ProductName);
         return new CouponModel { Id = getDiscountById!.Id.ToString(), ProductName = getDiscountById.ProductName, Description = getDiscountById.Description, Amount = getDiscountById.Amount };
 
     }
 
-    public override async Task<CouponModel> DeleteDiscount(DeleteDiscountRequest request, ServerCallContext context)
+    public override async Task<DeleteDiscountResponse> DeleteDiscount(DeleteDiscountRequest request, ServerCallContext context)
     {
         var cancellationToken = context.CancellationToken;
         //check if the coupon exists
@@ -66,19 +66,13 @@ public class DiscountService(DiscountContext discountContext, ILogger<DiscountSe
 
         if (getDiscountById is null)
         {
-            return new CouponModel { Id = "N/A", ProductName = "No Discount", Description = "No Discount Description", Amount = 0 };
+            throw new RpcException(new Status(StatusCode.NotFound, $"Discount with ProductName={request.Id} not found."));
         }
 
         //delete
         discountContext.Coupons.Remove(getDiscountById);
         await discountContext.SaveChangesAsync(cancellationToken: cancellationToken);
 
-        return new CouponModel
-        {
-            Id = getDiscountById.Id.ToString(),
-            ProductName = getDiscountById.ProductName,
-            Description = getDiscountById.Description,
-            Amount = getDiscountById.Amount
-        };
+        return new DeleteDiscountResponse { IsSuccess = true  };
     }
 }
