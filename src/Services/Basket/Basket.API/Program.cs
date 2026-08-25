@@ -1,17 +1,20 @@
 using Basket.API.Repositories;
 using BuildingBlocks.Exceptions.Handler;
+using Discount.Grpc.Protos;
 using HealthChecks.UI.Client;
+using ImTools;
+using JasperFx;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 // add services or register services to the container
-
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMarten(opt =>
 {
     opt.Connection(builder.Configuration.GetConnectionString("BasketDb")!);
     opt.Schema.For<ShoppingCart>().Identity(x => x.UserName);
+    opt.AutoCreateSchemaObjects = AutoCreate.CreateOnly;
 }).UseLightweightSessions();
 
 
@@ -20,6 +23,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
     options.SerializerOptions.PropertyNameCaseInsensitive = true;
 });
 
+//Data Services and Repositories
 builder.Services.AddCarter(new DependencyContextAssemblyCustom<Program>());
 builder.Services.AddMediatR(config =>
 {
@@ -35,6 +39,12 @@ builder.Services.AddStackExchangeRedisCache(opt =>
 {
     opt.Configuration = builder.Configuration.GetConnectionString("Redis");
 
+});
+
+//Add GRPC
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(opt =>
+{
+    opt.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
 });
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

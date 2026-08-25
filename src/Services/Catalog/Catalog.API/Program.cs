@@ -1,3 +1,5 @@
+using JasperFx;
+
 var builder = WebApplication.CreateBuilder(args);
 // register services
 // add services to the container
